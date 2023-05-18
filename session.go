@@ -29,7 +29,7 @@ type (
 	}
 	defaultValue struct {
 		Value  []byte
-		Expiry time.Time
+		Expire time.Time
 	}
 )
 
@@ -57,7 +57,7 @@ func (this *defaultConnect) Close() error {
 func (this *defaultConnect) Read(id string) ([]byte, error) {
 	if value, ok := this.sessions.Load(id); ok {
 		if vv, ok := value.(defaultValue); ok {
-			if vv.Expiry.Unix() > time.Now().Unix() {
+			if vv.Expire.Unix() > time.Now().Unix() {
 				return vv.Value, nil
 			} else {
 				//过期了就删除
@@ -69,11 +69,11 @@ func (this *defaultConnect) Read(id string) ([]byte, error) {
 }
 
 // 更新会话
-func (this *defaultConnect) Write(id string, data []byte, expiry time.Duration) error {
+func (this *defaultConnect) Write(id string, data []byte, expire time.Duration) error {
 	now := time.Now()
 
 	value := defaultValue{
-		Value: data, Expiry: now.Add(expiry),
+		Value: data, Expire: now.Add(expire),
 	}
 
 	this.sessions.Store(id, value)
